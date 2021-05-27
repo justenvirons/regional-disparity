@@ -1,0 +1,274 @@
+---
+title: "Evaluation of CCDPH Chronic Health Disparities"
+author: "C. Scott Smith, PhD AICP"
+date: "May 18, 2021"
+output: html_document
+---
+
+```{r chunk-options, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE,
+	include=TRUE
+)
+```
+
+```{r r-packages-settings}
+
+library(dplyr)
+library(tidyverse)
+library(sf)
+library(sp)
+library(spdep)
+library(rgdal)
+library(rgeos)
+library(spgwr)
+library(grid)
+library(gridExtra)
+library(bookdown)
+library(ggplot2)
+library(zoo)
+library(readxl)
+library(xtable)
+library(kableExtra)
+library(ggsci)
+library(jtools)
+
+
+library(clipr)
+
+
+# Change the presentation of decimal numbers to 4 and avoid scientific notation
+options(prompt="R> ", digits=4, scipen=999)
+```
+
+``` {r import-data, include=FALSE}
+
+INIL_Tracts_geom <- st_read("../layers/INIL_Tracts_geom.shp")
+INIL_Places_geom <- st_read("../layers/INIL_Places_geom.shp")
+INIL_Counties_geom <- st_read("../layers/INIL_Counties_geom.shp")
+
+places_tracts <- read_csv("../data/places_tracts.csv")
+places_datadictionary <- read_csv("../data/places_datadictionary.csv") %>% select(Name,Description)
+
+# filter tracts in seven-county area
+places_tracts_sa_sf <- places_tracts %>% 
+  select(-Geolocation) %>%
+  filter(StateAbbr=="IL" | StateAbbr=="IN",
+         CountyFIPS=="17031" | CountyFIPS=="17043" | CountyFIPS=="17089" | CountyFIPS=="17093" | CountyFIPS=="17097" | CountyFIPS=="17111" | CountyFIPS=="17197" | CountyFIPS=="18089") %>%
+  left_join(INIL_Tracts_geom, by=c("TractFIPS"="GEOID")) %>%
+  mutate(sqmi_land = ALAND*0.00000038610,
+         sqmi_water = AWATER*0.00000038610,
+         sqmi = sqmi_land+sqmi_water) %>%
+  ungroup() %>%
+  st_as_sf() %>% 
+  select(TotalPopulation,
+         SquareMiles = sqmi,
+         TractFIPS,
+         CountyFIPS,
+         ends_with("CrudePrev"))
+
+```
+
+```{r analytical-approach}
+# https://rpubs.com/quarcs-lab/spatial-autocorrelation
+# https://rdrr.io/cran/tmap/man/tm_polygons.html
+# https://www.rdocumentation.org/packages/spdep/versions/1.1-7/topics/moran.plot
+# https://swampthingecology.org/blog/nearest-neighbor-and-hot-spot-analysis-geospatial-data-analysis-in-rstats.-part-3b/
+```
+
+# Approach
+The objective is to delineate a geographically explicit health disparity region using multiple measures of chronic disease prevalence within the Chicago metro area. It was agreed that the geographic scope of consideration would be limited to an area composed of eight  counties including Cook, DuPage, Kane, Kendall, Lake (IL), McHenry and Will in Illinois and Lake (IN) in northwestern Indiana. Collectively, these counties span an area of 4,573 square miles (11,845 square kilometers) with a total population of 8.9 million (2018).
+
+To delineate the chronic health disparity area, we employ a multiscale and multidisease approach that utilizes three categories of geographies--census tracts; municipal and/or place boundaries; and county boundaries--and four measures of chronic disease prevalence (see Table 1). At the census tract level (N=4,629), we use global and local measures of spatial autocorrelation to identify a series of chronic disease clusters throughout the metropolitan area. These statistics are then evaluated to better understand both the relative intensity and spatial patterning of  clustering across diseases and communities.
+
+```{r data-dictionary}
+places_datadictionary %>%
+  filter(str_detect(Name,"CrudePrev") &
+         (str_detect(Name,"ARTHRITIS") |
+         str_detect(Name,"BPHIGH") |
+         str_detect(Name,"DIABETES") |
+         str_detect(Name,"OBESITY") |
+         str_detect(Name,"LPA"))) %>%
+  kbl(caption=paste0("Chronic Health Prevalance Variable Names and Descriptions")) %>%
+  kable_classic(full_width=T)
+
+```
+
+
+```{r spatial-autocorrelation}
+
+# create neighborhood structure 
+tracts_nb <- poly2nb(places_tracts_sa_sf, queen=TRUE)
+# tracts_nb
+
+# define weights matrix
+tracts_wm <- nb2listw(tracts_nb)
+# tracts_wm
+
+health_types <- as.data.frame(colnames(places_tracts_sa_sf)) %>%
+  rename(type = 1) %>%
+  filter(str_detect(type,"CrudePrev"))
+
+moran_stats <- data.frame(matrix(NA, ncol = 6, nrow = 0)) %>%
+  rename(type = 1,
+         morani = 2,
+         morane = 3,
+         moranv = 4,
+         moransd = 5,
+         moranp = 6) %>%
+  mutate(type = as.character(type),
+         morani = as.numeric(morani),
+         morane = as.numeric(morane),
+         moranv = as.numeric(moranv),
+         moransd  = as.numeric(moransd),
+         moranp = as.numeric(moranp)
+         )
+
+for (i in 1:nrow(health_types)) {
+  
+  places_tracts_sa_sf_type <- places_tracts_sa_sf %>%
+    st_drop_geometry() %>% 
+    select(health_types$type[i])
+  
+tracts_moran <- moran.test(places_tracts_sa_sf_type[[1]], tracts_wm, na.action = na.omit)
+
+moran_stats <- moran_stats %>%
+  bind_rows(as.data.frame(list(
+health_types$type[i],
+tracts_moran$estimate[[1]],
+tracts_moran$estimate[[2]],
+tracts_moran$estimate[[3]],
+tracts_moran$statistic[[1]],
+tracts_moran$p.value)) %>%
+  rename(type = 1,
+         morani = 2,
+         morane = 3,
+         moranv = 4,
+         moransd = 5,
+         moranp = 6))
+}
+
+moran_stats %>% 
+  arrange(-morani) %>% 
+  select(Category = type,
+         "Moran's I" = morani,
+         "Standard Deviation" = moransd,
+         "P Value" = moranp,
+         -morane, 
+         -moranv) %>%
+    filter(str_detect(Category,"CrudePrev") &
+         (str_detect(Category,"ARTHRITIS") |
+         str_detect(Category,"BPHIGH") |
+         str_detect(Category,"DIABETES") |
+         str_detect(Category,"OBESITY") |
+         str_detect(Category,"LPA"))) %>%
+  knitr::kable(booktabs = TRUE, caption=paste0("Moran's I Statistics for Chicago Metropolitan Area by Chronic Health Prevalance Category"))
+
+# par(mfrow=c(4,4))
+# for (i in 1:nrow(health_types)) {
+#   
+#   places_tracts_sa_sf_type <- places_tracts_sa_sf %>%
+#     st_drop_geometry() %>% 
+#     select(health_types$type[i])
+#   
+#   df_test <- places_tracts_sa_sf_type[[1]] %>% replace_na(0)
+#   
+# mp <- moran.plot(df_test, listw = nb2listw(tracts_nb, style = "W"), labels=FALSE, pch=19, zero.policy=FALSE)
+# 
+# ggplot(mp, aes(x=x, y=wx)) + geom_point(shape=1) + 
+#     geom_smooth(formula=y ~ x, method="lm") + 
+#     geom_hline(yintercept=mean(mp$wx), lty=2) + 
+#     geom_vline(xintercept=mean(mp$x), lty=2) + theme_minimal() + 
+#     geom_point(data=mp[mp$is_inf,], aes(x=x, y=wx), shape=9) +
+#     xlab(health_types$type[i]) + ylab("Spatially lagged")
+# }
+
+```
+
+```{r cumulative-prevalence-index}
+
+# create function for standardizing prevalence variables
+normalize <- function(x) {
+return ((x - min(x)) / (max(x) - min(x)))
+}
+
+# import race/ethnic data
+acs2019_bytract <- read_csv("../data/acs2019_bytract.csv") %>%
+  mutate(GEOID = as.character(GEOID))
+
+places_tracts_sa_vars <- places_tracts_sa_sf %>%
+  select(TractFIPS,
+         arth_cp = ARTHRITIS_CrudePrev,
+         bph_cp = BPHIGH_CrudePrev,
+         diab_cp = DIABETES_CrudePrev,
+         obes_cp = OBESITY_CrudePrev,
+         lpa_cp = LPA_CrudePrev) %>%
+mutate(arth_std = normalize(arth_cp),
+       bph_std = normalize(bph_cp),
+       diab_std = normalize(diab_cp),
+       obes_std = normalize(obes_cp),
+       lpa_std = normalize(lpa_cp),
+       cpi = (arth_std+bph_std+diab_std+obes_std+lpa_std)/5,
+       cpi_ntile = ntile(cpi,5)) %>%
+  left_join(acs2019_bytract,by=c("TractFIPS"="GEOID"))
+
+st_write(places_tracts_sa_vars, "../layers/places_tracts_sa_vars.shp", append=FALSE)
+
+```
+
+
+```{r lisa-clusters}
+
+# Generate local moran statistics for all health categories
+# Ii: local moran statistic; E.Ii: expectation of local moran statistic; Var.Ii: variance of local moran statistic; Z.Ii: standard deviate of local moran statistic; Pr(): p-value of local moran statistic
+
+local_df_all <- read_rds("../data/local_df.rds")
+
+for (i in 1:nrow(health_types)) {
+  
+  places_tracts_sa_sf_type <- places_tracts_sa_sf %>%
+    st_drop_geometry() %>% 
+    select(health_types$type[i],
+           TractFIPS) %>%
+    replace(is.na(.), 0)
+  df_test <- places_tracts_sa_sf_type[[1]]
+  
+  local <- localmoran(x = df_test, listw = nb2listw(tracts_nb, style = "W"))
+  
+  local_df <- as.data.frame(local) %>%
+    bind_cols(places_tracts_sa_sf_type) %>%
+    rename(CrudePrev = 6) %>%
+    mutate(type = health_types$type[i],
+           CrudePrev_std = CrudePrev - mean(CrudePrev),
+           Ii_std = Ii - mean(Ii),
+           quadrant = case_when(CrudePrev_std>0 & Ii_std >0 ~ 1,
+                                CrudePrev_std<0 & Ii_std <0 ~ 3,
+                                CrudePrev_std<0 & Ii_std >0 ~ 2,
+                                CrudePrev_std>0 & Ii_std <0 ~ 4),
+           label = case_when(CrudePrev_std>0 & Ii_std >0 ~ "high-high",
+                                CrudePrev_std<0 & Ii_std <0 ~ "low-low",
+                                CrudePrev_std<0 & Ii_std >0 ~ "low-high",
+                                CrudePrev_std>0 & Ii_std <0 ~ "high-low"),
+           quadrant = if_else(`Pr(z > 0)`>0.01,0,quadrant),
+           label = if_else(`Pr(z > 0)`>0.01,"not significant",label))
+  
+  local_df %>% group_by(quadrant) %>% summarise(n())
+
+  local_df_all <- local_df_all %>%
+    bind_rows(local_df)
+}
+
+# empty dataframe template
+local_df <- local_df[0,]
+write_rds(local_df, "../data/local_df.rds")
+
+```
+
+# Health disparity clusters
+The Moran I statistic is 0.79, suggesting that diabetes prevalence is highly positively autocorrelated in the Chicago metropolitan area. That is, census tracts with high rates of diabetes are spatially clustered (p-value < 0.000). We can also consider the p-value as a measure of the statistical significance of the model.
+
+
+
+
