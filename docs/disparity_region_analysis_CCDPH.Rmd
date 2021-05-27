@@ -288,6 +288,26 @@ for (i in 1:nrow(health_types)) {
 local_df <- local_df[0,]
 write_rds(local_df, "../data/local_df.rds")
 
+local_sf_all <- local_df_all %>%
+  left_join(INIL_Tracts_geom, by=c("TractFIPS"="GEOID")) %>%
+  filter(type=="DIABETES_CrudePrev",
+         `Pr(z > 0)`<=0.01) %>% 
+  st_as_sf() %>%
+  st_transform(crs=4326)
+
+pal <- colorBin("YlOrRd", domain = local_sf_all$Ii, n = 5)
+
+leaflet() %>% 
+  addPolygons(data=local_sf_all,
+              fillColor = ~pal(local_sf_all$Ii),
+              weight = 0.1,
+              opacity = 0.5,
+              color = "white",
+              dashArray = "3",
+              fillOpacity = 0.7) %>%
+  addProviderTiles(providers$CartoDB.Positron)
+
+
 ```
 
 # Health disparity clusters
