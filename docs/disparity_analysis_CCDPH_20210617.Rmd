@@ -369,8 +369,6 @@ leaflet() %>%
 
 ```
 
-# Health disparity clusters
-The Moran I statistic is 0.79, suggesting that diabetes prevalence is highly positively autocorrelated in the Chicago metropolitan area. That is, census tracts with high rates of diabetes are spatially clustered (p-value < 0.000). We can also consider the p-value as a measure of the statistical significance of the model.
 
 ```{r summary_tables}
 
