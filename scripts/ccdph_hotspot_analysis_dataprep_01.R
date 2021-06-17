@@ -61,7 +61,7 @@ grouplist <- c("B01001","B17001","B03002")
 # B03002: HISPANIC OR LATINO ORIGIN BY RACE
 
 # By census tract
-yearlist <- c(2010,2019)
+yearlist <- c(2019)
 for (agroup in grouplist) {
   for (ayear in yearlist) {
     print(paste0("importing ",ayear," data for table ",agroup))
