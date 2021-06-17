@@ -61,7 +61,7 @@ grouplist <- c("B01001","B17001","B03002")
 # B03002: HISPANIC OR LATINO ORIGIN BY RACE
 
 # By census tract
-yearlist <- c(2019)
+yearlist <- c(2010,2019)
 for (agroup in grouplist) {
   for (ayear in yearlist) {
     print(paste0("importing ",ayear," data for table ",agroup))
@@ -134,20 +134,6 @@ B17001_2019_sub <- B17001_2019 %>%
          PopPov_19 = B17001_002E,
          PctPov_19 = B17001_002E/B17001_001E*100) %>%
   select(GEOID, TotPov_19:PctPov_19)
-
-B17001_2010_sub <- B17001_2010 %>%
-  arrange(GEOID)%>%
-  mutate(TotPov_10 = B17001_001E,
-         PopPov_10 = B17001_002E,
-         PctPov_10 = B17001_002E/B17001_001E*100) %>%
-  select(GEOID,TotPov_10:PctPov_10)
-
-poverty_table <- B17001_2019_sub %>% 
-  left_join(B17001_2010_sub, by="GEOID") %>%
-  mutate(PctPov_1019 = (PopPov_19-PopPov_10)/PopPov_10*100,
-         PntPov_1019 = PctPov_19-PctPov_10)
-
-write_csv(poverty_table,"C:/Users/scott/OneDrive - CCDPH/OneDrive - Cook County Health/git_repos/justenvirons/ccdph-jurisdictions/layers.csv")
 
 # bind processed tables
 acs2019_bytract_df <- B01001_2019_sub %>%
