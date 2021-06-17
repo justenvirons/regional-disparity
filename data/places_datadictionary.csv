@@ -1,57 +1,57 @@
-Name,Description,Type,
-ACCESS2_CrudePrev,Model-based estimate for crude prevalence of current lack of health insurance among adults aged 18-64 years,Number,
-ACCESS2_Crude95CI,Estimated confidence interval for crude prevalence of current lack of health insurance among adults aged 18 - 64 years,Plain Text,
-ARTHRITIS_CrudePrev,Model-based estimate for crude prevalence of arthritis among adults aged >=18 years,Number,
-ARTHRITIS_Crude95CI,Estimated confidence interval for crude prevalence of arthritis among adults aged ?18 years,Plain Text,
-BINGE_CrudePrev,Model-based estimate for crude prevalence of binge drinking among adults aged >=18 years,Number,
-BINGE_Crude95CI,Estimated confidence interval for crude prevalence of binge drinking among adults aged >=18 years,Plain Text,
-BPHIGH_CrudePrev,Model-based estimate for crude prevalence of high blood pressure among adults aged >=18 years,Number,
-BPHIGH_Crude95CI,Estimated confidence interval for crude prevalence of high blood pressure among adults aged >=18 years,Plain Text,
-BPMED_CrudePrev,Model-based estimate for crude prevalence of taking medicine for high blood pressure control among adults aged >=18 years with high blood pressure,Number,
-BPMED_Crude95CI,Estimated confidence interval for crude prevalence of taking medicine for high blood pressure control among adults aged >=18 years with high blood pressure,Plain Text,
-CANCER_CrudePrev,Model-based estimate for crude prevalence of cancer (excluding skin cancer) among adults aged >=18 years,Number,
-CANCER_Crude95CI,Estimated confidence interval for crude prevalence of cancer (excluding skin cancer) among adults aged >=18 years,Plain Text,
-CASTHMA_CrudePrev,Model-based estimate for crude prevalence of current asthma among adults aged >=18 years,Number,
-CASTHMA_Crude95CI,Estimated confidence interval for crude prevalence of current asthma among adults aged >=18 years,Plain Text,
-CERVICAL_CrudePrev,Model-based estimate for crude prevalence of cervical cancer screening among adult women aged 21-65 years,Number,
-CERVICAL_Crude95CI,Estimated confidence interval for crude prevalence of cervical cancer screening among adult women aged 21-65 years,Plain Text,
-CHD_CrudePrev,Model-based estimate for crude prevalence of coronary heart disease among adults aged >=18 years,Number,
-CHD_Crude95CI,Estimated confidence interval for crude prevalence of coronary heart disease among adults aged >=18 years,Plain Text,
-CHECKUP_CrudePrev,Model-based estimate for crude prevalence of visits to doctor for routine checkup within the past year among adults aged >=18 years,Number,
-CHECKUP_Crude95CI,Estimated confidence interval for crude prevalence of visits to doctor for routine checkup within the past year among adults aged >=18 years,Plain Text,
-CHOLSCREEN_CrudePrev,Model-based estimate for crude prevalence of cholesterol screening among adults aged >=18 years,Number,
-CHOLSCREEN_Crude95CI,Estimated confidence interval for crude prevalence of cholesterol screening among adults aged >=18 years,Plain Text,
-COLON_SCREEN_CrudePrev,"Model-based estimate for crude prevalence of fecal occult blood test, sigmoidoscopy, or colonoscopy among adults aged 50-75 years",Number,
-COLON_SCREEN_Crude95CI,"Estimated confidence interval for crude prevalence of fecal occult blood test, sigmoidoscopy, or colonoscopy among adults aged 50-75 years",Plain Text,
-COPD_CrudePrev,Model-based estimate for crude prevalence of chronic obstructive pulmonary disease among adults aged >=18 years,Number,
-COPD_Crude95CI,Estimated confidence interval for crude prevalence of chronic obstructive pulmonary disease among adults aged >=18 years,Plain Text,
-COREM_CrudePrev,"Model-based estimate for crude prevalence of older adult men aged >=65 years who are up to date on a core set of clinical preventive services: Flu shot past year, PPV shot ever, Colorectal cancer screening",Number,
-COREM_Crude95CI,"Estimated confidence interval for crude prevalence of older adult men aged >=65 years who are up to date on a core set of clinical preventive services: Flu shot past year, PPV shot ever, Colorectal cancer screening",Plain Text,
-COREW_CrudePrev,"Model-based estimate for crude prevalence of older adult women aged >=65 years who are up to date on a core set of clinical preventive services: Flu shot past year, PPV shot ever, Colorectal cancer screening, and Mammogram past 2 years",Number,
-COREW_Crude95CI,"Estimated confidence interval for crude prevalence of older adult women aged >=65 years who are up to date on a core set of clinical preventive services: Flu shot past year, PPV shot ever, Colorectal cancer screening, and Mammogram past 2 years",Plain Text,
-CSMOKING_CrudePrev,Model-based estimate for crude prevalence of current smoking among adults aged >=18 years,Number,
-CSMOKING_Crude95CI,Estimated confidence interval for crude prevalence of current smoking among adults aged >=18 years,Plain Text,
-DENTAL_CrudePrev,Model-based estimate for crude prevalence of visits to dentist or dental clinic among adults aged >=18 years,Number,
-DENTAL_Crude95CI,Estimated confidence interval for crude prevalence of visits to dentist or dental clinic among adults aged >=18 years,Plain Text,
-DIABETES_CrudePrev,Model-based estimate for crude prevalence of diagnosed diabetes among adults aged >=18 years,Number,
-DIABETES_Crude95CI,Estimated confidence interval for crude prevalence of diagnosed diabetes among adults aged >=18 years,Plain Text,
-HIGHCHOL_CrudePrev,Model-based estimate for crude prevalence of high cholesterol among adults aged >=18 years who have been screened in the past 5 years,Number,
-HIGHCHOL_Crude95CI,Estimated confidence interval for crude prevalence of high cholesterol among adults aged >=18 years who have been screened in the past 5 years,Plain Text,
-KIDNEY_CrudePrev,Model-based estimate for crude prevalence of chronic kidney disease among adults aged >=18 years,Number,
-KIDNEY_Crude95CI,Estimated confidence interval for crude prevalence of chronic kidney disease among adults aged >=18 years,Plain Text,
-LPA_CrudePrev,Model-based estimate for crude prevalence of no leisure-time physical activity among adults aged >=18 years,Number,
-LPA_Crude95CI,Estimated confidence interval for crude prevalence of no leisure-time physical activity among adults aged >=18 years,Plain Text,
-MAMMOUSE_CrudePrev,Model-based estimate for crude prevalence of mammography use among women aged 50-74 years,Number,
-MAMMOUSE_Crude95CI,Estimated confidence interval for crude prevalence of mammography use among women aged 50-74 years,Plain Text,
-MHLTH_CrudePrev,Model-based estimate for crude prevalence of mental health not good for >=14 days among adults aged >=18 years,Number,
-MHLTH_Crude95CI,Estimated confidence interval for crude prevalence of mental health not good for >=14 days among adults aged >=18 years,Plain Text,
-OBESITY_CrudePrev,Model-based estimate for crude prevalence of obesity among adults aged >=18 years,Number,
-OBESITY_Crude95CI,Estimated confidence interval for crude prevalence of obesity among adults aged >=18 years,Plain Text,
-PHLTH_CrudePrev,Model-based estimate for crude prevalence of physical health not good for >=14 days among adults aged >=18 years,Number,
-PHLTH_Crude95CI,Estimated confidence interval for crude prevalence of physical health not good for >=14 days among adults aged >=18 years,Plain Text,
-SLEEP_CrudePrev,Model-based estimate for crude prevalence of sleeping less than 7 hours among adults aged >=18 years,Number,
-SLEEP_Crude95CI,Estimated confidence interval for crude prevalence of sleeping less than 7 hours among adults aged >=18 years,Plain Text,
-STROKE_CrudePrev,Model-based estimate for crude prevalence of stroke among adults aged >=18 years,Number,
-STROKE_Crude95CI,Estimated confidence interval for crude prevalence of stroke among adults aged >=18 years,Plain Text,
-TEETHLOST_CrudePrev,Model-based estimate for crude prevalence of all teeth lost among adults aged >=65 years,Number,
-TEETHLOST_Crude95CI,Estimated confidence interval for crude prevalence of all teeth lost among adults aged >=65 years,Plain Text,
+category,name,short_desc,long_desc,Type
+Prevention,ACCESS2_CrudePrev,Lack of health insurance,Model-based estimate for crude prevalence of current lack of health insurance among adults aged 18-64 years,Number
+Prevention,ACCESS2_Crude95CI,Lack of health insurance,Estimated confidence interval for crude prevalence of current lack of health insurance among adults aged 18 - 64 years,Plain Text
+Health outcome,ARTHRITIS_CrudePrev,Arthritis,Model-based estimate for crude prevalence of arthritis among adults aged >=18 years,Number
+Health outcome,ARTHRITIS_Crude95CI,Arthritis,Estimated confidence interval for crude prevalence of arthritis among adults aged ?18 years,Plain Text
+Unhealthy behaviors,BINGE_CrudePrev,Binge drinking,Model-based estimate for crude prevalence of binge drinking among adults aged >=18 years,Number
+Unhealthy behaviors,BINGE_Crude95CI,Binge drinking,Estimated confidence interval for crude prevalence of binge drinking among adults aged >=18 years,Plain Text
+Health outcome,BPHIGH_CrudePrev,High blood pressure (HBP),Model-based estimate for crude prevalence of high blood pressure among adults aged >=18 years,Number
+Health outcome,BPHIGH_Crude95CI,High blood pressure (HBP),Estimated confidence interval for crude prevalence of high blood pressure among adults aged >=18 years,Plain Text
+Prevention,BPMED_CrudePrev,Taking medicine for HBP,Model-based estimate for crude prevalence of taking medicine for high blood pressure control among adults aged >=18 years with high blood pressure,Number
+Prevention,BPMED_Crude95CI,Taking medicine for HBP,Estimated confidence interval for crude prevalence of taking medicine for high blood pressure control among adults aged >=18 years with high blood pressure,Plain Text
+Health outcome,CANCER_CrudePrev,Cancer,Model-based estimate for crude prevalence of cancer (excluding skin cancer) among adults aged >=18 years,Number
+Health outcome,CANCER_Crude95CI,Cancer,Estimated confidence interval for crude prevalence of cancer (excluding skin cancer) among adults aged >=18 years,Plain Text
+Health outcome,CASTHMA_CrudePrev,Asthma,Model-based estimate for crude prevalence of current asthma among adults aged >=18 years,Number
+Health outcome,CASTHMA_Crude95CI,Asthma,Estimated confidence interval for crude prevalence of current asthma among adults aged >=18 years,Plain Text
+Prevention,CERVICAL_CrudePrev,Cervical cancer screening,Model-based estimate for crude prevalence of cervical cancer screening among adult women aged 21-65 years,Number
+Prevention,CERVICAL_Crude95CI,Cervical cancer screening,Estimated confidence interval for crude prevalence of cervical cancer screening among adult women aged 21-65 years,Plain Text
+Health outcome,CHD_CrudePrev,Coronary heart disease,Model-based estimate for crude prevalence of coronary heart disease among adults aged >=18 years,Number
+Health outcome,CHD_Crude95CI,Coronary heart disease,Estimated confidence interval for crude prevalence of coronary heart disease among adults aged >=18 years,Plain Text
+Prevention,CHECKUP_CrudePrev,Routine checkups,Model-based estimate for crude prevalence of visits to doctor for routine checkup within the past year among adults aged >=18 years,Number
+Prevention,CHECKUP_Crude95CI,Routine checkups,Estimated confidence interval for crude prevalence of visits to doctor for routine checkup within the past year among adults aged >=18 years,Plain Text
+Prevention,CHOLSCREEN_CrudePrev,Cholesterol screening,Model-based estimate for crude prevalence of cholesterol screening among adults aged >=18 years,Number
+Prevention,CHOLSCREEN_Crude95CI,Cholesterol screening,Estimated confidence interval for crude prevalence of cholesterol screening among adults aged >=18 years,Plain Text
+Prevention,COLON_SCREEN_CrudePrev,Colon screening,"Model-based estimate for crude prevalence of fecal occult blood test, sigmoidoscopy, or colonoscopy among adults aged 50-75 years",Number
+Prevention,COLON_SCREEN_Crude95CI,Colon screening,"Estimated confidence interval for crude prevalence of fecal occult blood test, sigmoidoscopy, or colonoscopy among adults aged 50-75 years",Plain Text
+Health outcome,COPD_CrudePrev,Chronic obstructive pulmonary disease,Model-based estimate for crude prevalence of chronic obstructive pulmonary disease among adults aged >=18 years,Number
+Health outcome,COPD_Crude95CI,Chronic obstructive pulmonary disease,Estimated confidence interval for crude prevalence of chronic obstructive pulmonary disease among adults aged >=18 years,Plain Text
+Prevention,COREM_CrudePrev,"Core preventative services, male","Model-based estimate for crude prevalence of older adult men aged >=65 years who are up to date on a core set of clinical preventive services: Flu shot past year, PPV shot ever, Colorectal cancer screening",Number
+Prevention,COREM_Crude95CI,"Core preventative services, male","Estimated confidence interval for crude prevalence of older adult men aged >=65 years who are up to date on a core set of clinical preventive services: Flu shot past year, PPV shot ever, Colorectal cancer screening",Plain Text
+Prevention,COREW_CrudePrev,"Core preventative services, female","Model-based estimate for crude prevalence of older adult women aged >=65 years who are up to date on a core set of clinical preventive services: Flu shot past year, PPV shot ever, Colorectal cancer screening, and Mammogram past 2 years",Number
+Prevention,COREW_Crude95CI,"Core preventative services, female","Estimated confidence interval for crude prevalence of older adult women aged >=65 years who are up to date on a core set of clinical preventive services: Flu shot past year, PPV shot ever, Colorectal cancer screening, and Mammogram past 2 years",Plain Text
+Unhealthy behaviors,CSMOKING_CrudePrev,Smoking,Model-based estimate for crude prevalence of current smoking among adults aged >=18 years,Number
+Unhealthy behaviors,CSMOKING_Crude95CI,Smoking,Estimated confidence interval for crude prevalence of current smoking among adults aged >=18 years,Plain Text
+Prevention,DENTAL_CrudePrev,Dental visits,Model-based estimate for crude prevalence of visits to dentist or dental clinic among adults aged >=18 years,Number
+Prevention,DENTAL_Crude95CI,Dental visits,Estimated confidence interval for crude prevalence of visits to dentist or dental clinic among adults aged >=18 years,Plain Text
+Health outcome,DIABETES_CrudePrev,Diabetes,Model-based estimate for crude prevalence of diagnosed diabetes among adults aged >=18 years,Number
+Health outcome,DIABETES_Crude95CI,Diabetes,Estimated confidence interval for crude prevalence of diagnosed diabetes among adults aged >=18 years,Plain Text
+Health outcome,HIGHCHOL_CrudePrev,High cholesterol,Model-based estimate for crude prevalence of high cholesterol among adults aged >=18 years who have been screened in the past 5 years,Number
+Health outcome,HIGHCHOL_Crude95CI,High cholesterol,Estimated confidence interval for crude prevalence of high cholesterol among adults aged >=18 years who have been screened in the past 5 years,Plain Text
+Health outcome,KIDNEY_CrudePrev,Chronic kidney disease,Model-based estimate for crude prevalence of chronic kidney disease among adults aged >=18 years,Number
+Health outcome,KIDNEY_Crude95CI,Chronic kidney disease,Estimated confidence interval for crude prevalence of chronic kidney disease among adults aged >=18 years,Plain Text
+Unhealthy behaviors,LPA_CrudePrev,No leisure-time physical activity,Model-based estimate for crude prevalence of no leisure-time physical activity among adults aged >=18 years,Number
+Unhealthy behaviors,LPA_Crude95CI,No leisure-time physical activity,Estimated confidence interval for crude prevalence of no leisure-time physical activity among adults aged >=18 years,Plain Text
+Prevention,MAMMOUSE_CrudePrev,Mammography,Model-based estimate for crude prevalence of mammography use among women aged 50-74 years,Number
+Prevention,MAMMOUSE_Crude95CI,Mammography,Estimated confidence interval for crude prevalence of mammography use among women aged 50-74 years,Plain Text
+Health outcome,MHLTH_CrudePrev,Mental health not good,Model-based estimate for crude prevalence of mental health not good for >=14 days among adults aged >=18 years,Number
+Health outcome,MHLTH_Crude95CI,Mental health not good,Estimated confidence interval for crude prevalence of mental health not good for >=14 days among adults aged >=18 years,Plain Text
+Unhealthy behaviors,OBESITY_CrudePrev,Obesity,Model-based estimate for crude prevalence of obesity among adults aged >=18 years,Number
+Unhealthy behaviors,OBESITY_Crude95CI,Obesity,Estimated confidence interval for crude prevalence of obesity among adults aged >=18 years,Plain Text
+Health outcome,PHLTH_CrudePrev,Physical health not good,Model-based estimate for crude prevalence of physical health not good for >=14 days among adults aged >=18 years,Number
+Health outcome,PHLTH_Crude95CI,Physical health not good,Estimated confidence interval for crude prevalence of physical health not good for >=14 days among adults aged >=18 years,Plain Text
+Unhealthy behaviors,SLEEP_CrudePrev,Sleeping less than 7 hours,Model-based estimate for crude prevalence of sleeping less than 7 hours among adults aged >=18 years,Number
+Unhealthy behaviors,SLEEP_Crude95CI,Sleeping less than 7 hours,Estimated confidence interval for crude prevalence of sleeping less than 7 hours among adults aged >=18 years,Plain Text
+Health outcome,STROKE_CrudePrev,Stroke,Model-based estimate for crude prevalence of stroke among adults aged >=18 years,Number
+Health outcome,STROKE_Crude95CI,Stroke,Estimated confidence interval for crude prevalence of stroke among adults aged >=18 years,Plain Text
+Health outcome,TEETHLOST_CrudePrev,All teeth lost,Model-based estimate for crude prevalence of all teeth lost among adults aged >=65 years,Number
+Health outcome,TEETHLOST_Crude95CI,All teeth lost,Estimated confidence interval for crude prevalence of all teeth lost among adults aged >=65 years,Plain Text

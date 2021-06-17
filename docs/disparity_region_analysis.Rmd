@@ -254,8 +254,6 @@ for (i in 1:nrow(health_types)) {
            quadrant = if_else(`Pr(z > 0)`>0.01,0,quadrant),
            label = if_else(`Pr(z > 0)`>0.01,"not significant",label))
   
-  local_df %>% group_by(quadrant) %>% summarise(n())
-
   local_df_all <- local_df_all %>%
     bind_rows(local_df)
 }

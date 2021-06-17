@@ -58,10 +58,7 @@ INIL_Counties_geom <- st_read("../layers/INIL_Counties_geom.shp")
 
 INIL_Counties_geom_sub <- INIL_Counties_geom %>% 
   filter(STATEFP=="17" | STATEFP=="18",
-         GEOID=="17031" | GEOID=="17043" | GEOID=="17089" | GEOID=="17093" | GEOID=="17097" | GEOID=="17111" | GEOID=="17197" | GEOID=="18089") %>%
-    mutate(sqmi_land = ALAND*0.00000038610,
-         sqmi_water = AWATER*0.00000038610,
-         sqmi = sqmi_land+sqmi_water) %>% 
+         GEOID=="17031" | GEOID=="17043" | GEOID=="17089" | GEOID=="17093" | GEOID=="17097" | GEOID=="17111" | GEOID=="17197" | GEOID=="18089") %>% 
   st_transform(crs=4326)
 
 labels <- sprintf(
@@ -108,8 +105,8 @@ places_datadictionary <- read_csv("../data/places_datadictionary.csv") %>% selec
 # filter tracts in eight-county study area
 places_tracts_sa_sf <- places_tracts %>% 
   select(-Geolocation) %>%
-  filter(StateAbbr=="IL",
-         CountyFIPS=="17031") %>%
+  filter(StateAbbr=="IL" | StateAbbr=="IN",
+         CountyFIPS=="17031" | CountyFIPS=="17043" | CountyFIPS=="17089" | CountyFIPS=="17093" | CountyFIPS=="17097" | CountyFIPS=="17111" | CountyFIPS=="17197" | CountyFIPS=="18089") %>%
   left_join(INIL_Tracts_geom, by=c("TractFIPS"="GEOID")) %>%
   mutate(sqmi_land = ALAND*0.00000038610,
          sqmi_water = AWATER*0.00000038610,
@@ -134,8 +131,8 @@ places_datadictionary %>%
          str_detect(Name,"DIABETES") |
          str_detect(Name,"OBESITY") |
          str_detect(Name,"LPA"))) %>%
-  kbl(caption=paste0("Chronic Health Prevalance Variable Names and Descriptions")) %>%
-  kable_classic(full_width=T)
+  kbl(caption=paste0("PLACES Health Indicator Variable Names and Descriptions")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
 
 ```
 
@@ -201,14 +198,14 @@ moran_stats %>%
          "P Value" = moranp,
          -morane, 
          -moranv) %>%
-    filter(str_detect(Category,"CrudePrev") &
+    filter(str_detect(Category,"CrudePrev")&
          (str_detect(Category,"ARTHRITIS") |
          str_detect(Category,"BPHIGH") |
          str_detect(Category,"DIABETES") |
          str_detect(Category,"OBESITY") |
          str_detect(Category,"LPA"))) %>%
   kbl(caption=paste0("Moran's I Statistics for Chicago Metropolitan Area by Public Health Indicator")) %>%
-  kable_classic(full_width=FALSE)
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
 ```
 
 ```{r cumulative-prevalence-index}
@@ -248,6 +245,9 @@ mutate(arth_std = normalize(arth_cp),
 # Generate local moran statistics for all health categories
 # Ii: local moran statistic; E.Ii: expectation of local moran statistic; Var.Ii: variance of local moran statistic; Z.Ii: standard deviate of local moran statistic; Pr(): p-value of local moran statistic
 
+
+# Red highlighted regions have high values of the variable and have neighbors that also have high values (high-high). As indicated in the legend, blue area are low-low in the same scheme, while pale blue regions are low-high and pink areas are high-low. The strongly colored regions are therefore those that contribute significantly to a positive global spatial autocorrelation outcome, while paler colors contribute significantly to a negative autocorrelation outcome.
+
 local_df_all <- read_rds("../data/local_df.rds")
 
 for (i in 1:nrow(health_types)) {
@@ -278,8 +278,6 @@ for (i in 1:nrow(health_types)) {
            quadrant = if_else(`Pr(z > 0)`>0.01,0,quadrant),
            label = if_else(`Pr(z > 0)`>0.01,"not significant",label))
   
-  local_df %>% group_by(quadrant) %>% summarise(n())
-
   local_df_all <- local_df_all %>%
     bind_rows(local_df)
 }
@@ -290,21 +288,32 @@ write_rds(local_df, "../data/local_df.rds")
 
 local_sf_all <- local_df_all %>%
   left_join(INIL_Tracts_geom, by=c("TractFIPS"="GEOID")) %>%
-  filter(type=="DIABETES_CrudePrev",
+  filter(type=="LPA_CrudePrev",
          `Pr(z > 0)`<=0.01) %>% 
   st_as_sf() %>%
   st_transform(crs=4326)
 
-pal <- colorBin("YlOrRd", domain = local_sf_all$Ii, n = 5)
+pal_lisa <- colorFactor(
+  palette = c('red', '#fadbd8', '#aed6f1', 'blue'),
+  local_sf_all$label
+)
 
 leaflet() %>% 
   addPolygons(data=local_sf_all,
-              fillColor = ~pal(local_sf_all$Ii),
+              fillColor = ~pal_lisa(label),
               weight = 0.1,
               opacity = 0.5,
               color = "white",
               dashArray = "3",
               fillOpacity = 0.7) %>%
+    addPolygons(data=INIL_Counties_geom_sub,
+              fill = FALSE,
+              weight = 1,
+              opacity = 0.5,
+              color = "gray",
+              dashArray = "3",
+              fillOpacity = 0.7) %>%
+  addLegend("bottomright", pal = pal_lisa, values=c("high-high","high-low","low-high","low-low"), opacity = 1, title="LISA clusters") %>%
   addProviderTiles(providers$CartoDB.Positron)
 
 

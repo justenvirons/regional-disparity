@@ -1,3 +1,9 @@
+# Exclude folders
+layers/*
+maps/*
+data/*
+refs/*
+
 # History files
 .Rhistory
 .Rapp.history
