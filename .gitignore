@@ -8,6 +8,9 @@ refs/*
 .Rhistory
 .Rapp.history
 
+# Project files
+.Rproj
+
 # Session Data files
 .RData
 
