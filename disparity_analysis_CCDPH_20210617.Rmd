@@ -29,6 +29,7 @@ library(kableExtra)
 library(Hmisc)
 library(bookdown)
 library(corrplot)
+library(units)
 
 # Change the presentation of decimal numbers to 4 and avoid scientific notation
 options(digits=4, scipen=999)
@@ -133,24 +134,18 @@ This report maps the geographic patterning of chronic health conditions to ident
 # Study areas
 We examine patterns of chronic disease prevalence within two study areas; one multi-county and regional and the other confined to CCDPH's jurisdiction within Cook County. The regional, multiple county analysis examines broader public health patterns across seven counties, specifically, Cook, DuPage, Kane, Kendall, Lake, McHenry and Will county all located in the Chicago metropolitan area of northeastern Illinois. Collectively, this contiguous area spans `r prettyNum(set_units(st_area(studyarea_region$x),mi^2), big.mark = ",")` square miles (`prettyNum(set_units(st_area(studyarea_region$x),km^2), big.mark = ",")` square kilometers) and has a combined residential population of `r prettyNum(sum(studyarea_counties_acs$TotalPop_sum)/1000000, digits=2)` million (ACS, 2019). 
 
-These seven counties were selected in part because they represent considerable diversity both in terms of urban design (e.g., including both higher-density urban centers as well as lower-density exurban communities) and sociodemographic makeup. The counties also correspond with the Chicago Metropolitan Agency for Planning's (CMAP) planning area thereby allowing for ready integration of the metropolitan planning organization's rich datasets and presenting opportunities for future research to be carried across CMAP's jurisdiction. In addition to the regional analysis, we carry out a similar evaluation of disease and disparity within CCDPH's jurisdiction which is wholly contained within Cook County.
+These seven counties were selected in part because they represent considerable diversity both in terms of urban design (e.g., including both higher-density urban centers as well as lower-density exurban communities) and sociodemographic makeup. The counties also correspond with the Chicago Metropolitan Agency for Planning's (CMAP) planning area thereby allowing for ready integration of the metropolitan planning organization's rich datasets. In addition to the regional analysis, we carry out a similar evaluation of disease and disparity within CCDPH's jurisdiction which is wholly contained within Cook County.
 
 ```{r study_area_map, fig.cap="Chicago Metropolitan Region Study Area Boundary, Counties"}
 
 labels <- sprintf(
-  "<strong>%s</strong><br/>%s mi<sup>2</sup><br/>%s",
+  "<strong>%s</strong><br/>
+  %s mi<sup>2</sup>",
   paste0(studyarea_counties_acs$name_county," County"),
-  paste0("Area: ", prettyNum(studyarea_counties_acs$sqmi_county,digits=2, big.mark = ",")),
-  paste0("Population: ", prettyNum(studyarea_counties_acs$TotalPop_sum/1000000, digits=2), " million")) %>% lapply(htmltools::HTML)
-
+  paste0("Area: ", prettyNum(studyarea_counties_acs$sqmi_county,digits=2, big.mark = ","))) %>% lapply(htmltools::HTML)
+  
 leaflet() %>%
   addProviderTiles(providers$CartoDB.Positron) %>%
-  addPolygons(group = "places",
-              data = studyarea_places %>% st_transform(crs=4326),
-              fill="grey",
-              weight = 0.5,
-              color = "white",
-              fillOpacity = 0.25) %>%
   addPolygons(group = "county",
               data=studyarea_counties_acs %>% st_transform(crs=4326),
               fillColor = "orange",
@@ -176,7 +171,7 @@ leaflet() %>%
               weight = 3,
               color = "black") %>%
       addLayersControl(
-          overlayGroups =c("county", "places", "boundary"),
+          overlayGroups =c("county","boundary"),
           options = layersControlOptions(collapsed=FALSE)
           )
 
@@ -195,19 +190,24 @@ The analysis uses ACS 5-year estimates of study area populations by age, race, e
 Topologically Integrated Geographic Encoding and Referencing (TIGER) Database (MTDB) or TIGER/Line shapefiles of the study area were used to link geographies to data in both the ACS and PLACES at the census tract level. The geometries made it possible to estimate global and spatial autocorrelation across sociodemographic and chronic disease variables.
 
 ```{r spatial_autocorrelation}
+# prepare data for, estimate global Moran's I statistic for each health type in the PLACES dataset. Global and local Moran's I measures of spatial autocorrelation were preferred over the Getis-Ord hot spot detection method, in part because prevalence values tend to be unevenly distributed geographically, with clusters of both high and low values. Such clusters of high and low values tend to cancel each other out in the Getis-Ord statistic, thus better modeled with Moran's I.
 
-# Create queen neighborhood structure 
+# create queen neighborhood structure for spatial lag calculation. Unlike the rook contiguity which determines neighbors based on common sides of polygons, exclusively, the queen criterion  also includes common vertices. The queen criterion is recommended in practice because it deals with potential inaccuracies in the polygon file (such as rounding errors), . 
+
 tracts_nb <- poly2nb(studyarea_tracts_disease, queen=TRUE)
 # tracts_nb
 
-# Define neighborhood weights matrix
+# define neighborhood weights matrix. In this case all neighbors are weighted equally in subsequent spatial lag calculations.
 tracts_wm <- nb2listw(tracts_nb)
 # tracts_wm
+
+# create table with all types in the PLACES dataset. This table is used to iterate, filter when estimating the global and, later, local spatial autocorrelation calculations.
 
 health_types <- as.data.frame(colnames(studyarea_tracts_disease)) %>%
   rename(type = 1) %>%
   filter(str_detect(type,"CrudePrev"))
 
+# create data frame for storing Moran's I statistics
 moran_stats <- data.frame(matrix(NA, ncol = 6, nrow = 0)) %>%
   rename(type = 1,
          morani = 2,
@@ -223,6 +223,7 @@ moran_stats <- data.frame(matrix(NA, ncol = 6, nrow = 0)) %>%
          moranp = as.numeric(moranp)
          )
 
+# calculate global Moran's I statistics for each health type
 for (i in 1:nrow(health_types)) {
   
   studyarea_tracts_type <- studyarea_tracts_disease %>%
@@ -244,15 +245,19 @@ for (i in 1:nrow(health_types)) {
          moranp = 6))
 }
 
+# create output table with global Moran's I results. If the values in the dataset tend to cluster spatially (high values cluster near other high values; low values cluster near other low values), the Moran's Index will be positive. When high values repel other high values, and tend to be near low values, the Index will be negative. If positive cross-product values balance negative cross-product values, the Index will be near zero. The numerator is normalized by the variance so that Index values fall between -1.0 and +1.0.
+
 moran_stats %>% 
+  left_join(places_datadictionary, by=c("type"="name")) %>%
   arrange(-morani) %>% 
-  select(Name = type,
+  select(Variable = type,
+         Description = short_desc,
          "Moran's I" = morani,
          "Standard Deviation" = moransd,
          -morane, 
          -moranv) %>%
-    filter(str_detect(Name,"CrudePrev")) %>%
-  mutate(Name = tolower(str_replace_all(Name, "_CrudePrev", ""))) %>%
+    filter(str_detect(Variable,"CrudePrev")) %>%
+  mutate(Variable = tolower(str_replace_all(Variable, "_CrudePrev", ""))) %>%
   kbl(caption=paste0("Moran's I Statistics for Chicago Metropolitan Area by Chronic Health Prevalance Category")) %>%
   kable_classic(full_width=F)
 
@@ -260,10 +265,13 @@ moran_stats %>%
 
 ```{r prevalence_index, include=FALSE}
 
-# create function for standardizing prevalence variables
+# function for Min-Max normalizing prevalence variables. transforms data to 0 to 1 scale by subtracting the minimum and dividing by the maximum of all observations. such normalization preserves the shape of each variable’s distribution while making them easily comparable on the same “scale”.
+
 normalize <- function(x) {
 return ((x - min(x)) / (max(x) - min(x)))
 }
+
+# creates table with normalized and quintile rank scores by census tracts for each of the PLACES health types. also joins ACS data and census tract geometries.
 
 places_tracts_sa_vars <- studyarea_tracts_disease %>%
 # filter(StudyArea == "Outside CCDPH") %>%
@@ -287,17 +295,45 @@ mutate(arth_std = normalize(arth_cp),
   left_join(acs2019_bytract,by=c("geoid_tract"="GEOID")) %>%
   st_as_sf()
 
-st_write(places_tracts_sa_vars, "layers/places_tracts_sa_vars.shp", append=FALSE)
+# st_write(places_tracts_sa_vars, "layers/places_tracts_sa_vars.shp", append=FALSE)
 
 ```
 
 
 ```{r lisa_clusters}
 
-# Generate local moran statistics for all health categories
-# Ii: local moran statistic; E.Ii: expectation of local moran statistic; Var.Ii: variance of local moran statistic; Z.Ii: standard deviate of local moran statistic; Pr(): p-value of local moran statistic
+# generate local indicator of spatial association (LISA) statistics for all prevalence categories by census tract. the sum of LISA statistics for all observations is proportional to the global indicator of spatial association. 
 
-local_df_all <- read_rds("data/local_df.rds")
+# Statistics include: Ii: local moran statistic (where i is census tract); E.Ii: expectation of local moran statistic; Var.Ii: variance of local moran statistic; Z.Ii: standard deviate of local moran statistic; Pr(): p-value of local moran statistic
+
+# create data frame for storing LISA values
+local_df_all <- data.frame(matrix(NA, ncol = 12, nrow = 0)) %>%
+  rename(Ii = 1,
+         E.Ii = 2,
+         Var.Ii = 3,
+         Z.Ii = 4,
+         `Pr(z > 0)` = 5,
+         CrudePrev = 6,
+         geoid_tract = 7,
+         type = 8,
+         CrudePrev_std = 9,
+         Ii_std = 10,
+         quadrant = 11,
+         label = 12) %>%
+  mutate(Ii = as.numeric(Ii),
+         E.Ii = as.numeric(E.Ii),
+         Var.Ii = as.numeric(Var.Ii),
+         Z.Ii = as.numeric(Z.Ii),
+         `Pr(z > 0)`  = as.numeric(`Pr(z > 0)`),
+         CrudePrev = as.numeric(CrudePrev),
+         geoid_tract = as.character(geoid_tract),
+         type = as.character(type),
+         CrudePrev_std = as.numeric(CrudePrev_std),
+         Ii_std = as.numeric(Ii_std),
+         quadrant = as.numeric(quadrant),
+         label = as.character(label))
+
+# estimate LISA statistics by census tract and prevalence type
 
 for (i in 1:nrow(health_types)) {
   
@@ -331,22 +367,22 @@ for (i in 1:nrow(health_types)) {
     bind_rows(local_df)
 }
 
-# empty dataframe template
-local_df <- local_df[0,]
-write_rds(local_df, "data/local_df.rds")
 
+# join census tract geometries to LISA scores for selected prevalence category
 local_sf_all <- local_df_all %>%
   left_join(studyarea_tracts, by="geoid_tract") %>%
-  filter(type=="LPA_CrudePrev",
+  filter(type=="LPA_CrudePrev", #DIABETES_CrudePrev
          `Pr(z > 0)`<=0.01) %>% 
   st_as_sf() %>%
   st_transform(crs=4326)
 
+# create standard LISA legend
 pal_lisa <- colorFactor(
   palette = c('red', '#fadbd8', '#aed6f1', 'blue'),
   local_sf_all$label
 )
 
+# create map of LISA clusters
 leaflet() %>% 
   addPolygons(data=local_sf_all,
               fillColor = ~pal_lisa(label),
@@ -375,7 +411,7 @@ leaflet() %>%
 
 ```{r summary_tables}
 
-places_tracts_sa_vars_in %>% st_drop_geometry() %>% group_by(cpi_ntile) %>% summarise(n())
+places_tracts_sa_vars %>% st_drop_geometry() %>% group_by(cpi_ntile) %>% summarise(n())
 
 places_tracts_sa_vars_sum <- places_tracts_sa_vars %>%
   st_drop_geometry() %>%
@@ -419,7 +455,6 @@ places_tracts_sa_vars_sum_alt <- cbind(rownames(places_tracts_sa_vars_sum), data
 
 colnames(places_tracts_sa_vars_sum_alt) <- places_tracts_sa_vars_sum_alt[c(1),]
 places_tracts_sa_vars_sum_alt <- places_tracts_sa_vars_sum_alt[-c(1),]
-
 
 places_tracts_sa_vars_sum_alt %>%
   rename(Category = cpi_group) %>%

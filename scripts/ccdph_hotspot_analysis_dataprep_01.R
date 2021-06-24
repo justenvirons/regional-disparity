@@ -14,7 +14,6 @@ library(tigris)
 library(censusapi)
 library(sf)
 library(readxl)
-library(ggmap)
 library(units)
 
 # Download data ---------------------------------------------------------------
@@ -49,7 +48,6 @@ INIL_Counties_geom <- st_transform(INIL_Counties_geom, crs = 26916)
 st_write(INIL_Counties_geom,"layers/INIL_Counties_geom.shp", append = FALSE)
 st_write(INIL_Places_geom,"layers/INIL_Places_geom.shp", append = FALSE)
 st_write(INIL_Tracts_geom,"layers/INIL_Tracts_geom.shp", append = FALSE)
-st_write(CCDPH_geom,"layers/CCDPH_geom.shp", append = FALSE)
 
 ## ACS 2015-2019 ---------------------------------------------------------------
 # download ACS data
@@ -61,7 +59,7 @@ grouplist <- c("B01001","B17001","B03002")
 # B03002: HISPANIC OR LATINO ORIGIN BY RACE
 
 # By census tract
-yearlist <- c(2019)
+yearlist <- c(2018)
 for (agroup in grouplist) {
   for (ayear in yearlist) {
     print(paste0("importing ",ayear," data for table ",agroup))
@@ -83,7 +81,7 @@ for (agroup in grouplist) {
 
 # Transform, subset tables
 # B01001: SEX BY AGE
-B01001_2019_sub <- B01001_2019 %>% 
+B01001_2018_sub <- B01001_2018 %>% 
   rowwise() %>%
   mutate(
     TotalPop = B01001_001E, 
@@ -115,7 +113,7 @@ B01001_2019_sub <- B01001_2019 %>%
   arrange(GEOID)
 
 # B03002: HISPANIC OR LATINO ORIGIN BY RACE
-B03002_2019_sub <- B03002_2019 %>%
+B03002_2018_sub <- B03002_2018 %>%
   arrange(GEOID) %>%
   rowwise() %>%
   mutate(TotalRace = B03002_001E,
@@ -127,18 +125,10 @@ B03002_2019_sub <- B03002_2019 %>%
   select(GEOID, TotalRace:PopWht) %>%
   mutate_at(vars(PopBlk:PopWht), .funs = (list(pct = ~(./TotalRace*100))))
 
-# POVERTY LEVEL INCOME
-B17001_2019_sub <- B17001_2019 %>%
-  arrange(GEOID)%>%
-  mutate(TotPov_19 = B17001_001E,
-         PopPov_19 = B17001_002E,
-         PctPov_19 = B17001_002E/B17001_001E*100) %>%
-  select(GEOID, TotPov_19:PctPov_19)
-
 # bind processed tables
-acs2019_bytract_df <- B01001_2019_sub %>%
-  left_join(B03002_2019_sub, by = "GEOID") %>%
-  left_join(B17001_2019_sub, by = "GEOID")
+acs2019_bytract_df <- B01001_2018_sub %>%
+  left_join(B03002_2018_sub, by = "GEOID") %>%
+  left_join(B17001_2018_sub, by = "GEOID")
 
 # write ACS csv tables to working directory
-write_csv(acs2019_bytract_df, "data/acs2019_bytract.csv")
+write_csv(acs2018_bytract_df, "data/acs2019_bytract.csv")
