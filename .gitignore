@@ -9,7 +9,7 @@ refs/*
 .Rapp.history
 
 # Project files
-.Rproj
+*.Rproj
 
 # Session Data files
 .RData
